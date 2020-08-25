@@ -2,7 +2,9 @@ INF = 2 ** 32
 
 class DVNode:
     """
-    initial_vector: vector of initial weights to this nodes neighbors
+    id: id de este nodo
+    initial_vector: vector que contiene los pesos de cada vecino, o
+                    INF si no existe la coneccion.
     """
     def __init__(self, id, initial_vector):
         self.id = id
