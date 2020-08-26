@@ -12,7 +12,7 @@ users = {}
 #counters
 usersC = 0
 
-def process_message(message, connection): 
+def process_message(message, connection):
     global usersC
     obj = json.loads(message)
     response =	{
