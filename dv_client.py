@@ -38,11 +38,13 @@ class DVClient:
             
             # si hay mensajes pendientes, procesar
             if to_read:
-                data = self.socket.recv(1024)
+                data = self.socket.recv(512)
                 if data:
                     print(f'Nodo {self.node.id}: hay data, leyendo...')
                     data = data.decode('utf-8')
+                    print('********* DATA **********')
                     print(data)
+                    print('*************************')
                 else:
                     print(f'Nodo {self.node.id} no hay data para leer.')
 
@@ -51,7 +53,12 @@ class DVClient:
 
             # enviar tabla a vecinos
             for n in self.node.neighbors:
-                msg = {"type": 103, "idSender": self.node.id, "idReciever": n, "message": "ola"}
+                table_msg = {"type": 0, "table": self.node.table}
+                msg = {"type": 103, "idSender": self.node.id, "idReciever": n, "message": table_msg, "p": ""}
+
+                size = len(json.dumps(msg).encode('utf-8'))
+                msg["p"] = '0' * (512 - size)
+                
                 msg = json.dumps(msg)
                 msg = msg.encode('utf-8')
                 self.socket.sendall(msg)

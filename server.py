@@ -40,9 +40,13 @@ def process_message(message, connection):
         response["idSender"] = obj["idSender"]
         response["idReciever"] = obj["idReciever"]
         response["message"] = obj["message"]
+        
+        if "p" in obj:
+            response["p"] = obj["p"]
+        
         #Send Message
         users[obj["idReciever"]]["socket"].send(repr(response).encode("utf-8"))
-        response = None 
+        response = None
         
         #response["type"] = 404
     elif (obj["type"] == 105): #104 Create room
