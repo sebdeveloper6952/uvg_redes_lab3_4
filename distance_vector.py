@@ -61,7 +61,7 @@ class DVNode:
                 best_cost = self.table[id_to][i]
                 best_node_id = i
         
-        return best_node_id
+        return best_node_id, best_cost
         
 
     def get_shortest_paths(self):

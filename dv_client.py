@@ -3,13 +3,15 @@ import sys
 import json
 from distance_vector import DVNode, INF
 from select import select
-from time import sleep
+from time import sleep, time
 from threading import Thread
 
 MSG_SIZE = 2048
+LOG_FILE = 'dv_log.txt'
 
 class DVClient:
     def __init__(self, host, port, node_id, neighbors):
+        self.log = ''
         self.host = host
         self.port = int(port)
         self.my_id = int(node_id)
@@ -29,6 +31,16 @@ class DVClient:
             for i in range(len(paths)):
                 paths_s += 'Hacia '+str(i)+' me voy por '+str(paths[i][0])+' con costo '+str(paths[i][1])+'\n'
             f.write(paths_s)
+
+    def write_to_log_file(self):
+        """
+        Escribe al archivo de log sobre los mensajes enviados a traves de este nodo.
+        Tambien imprime a consola para revisión.
+        """
+        print(self.log)
+        with open(f'./log/{LOG_FILE}', 'a') as f:
+            f.write(self.log)
+        self.log = ''
 
     def init_socket(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -98,13 +110,15 @@ class DVClient:
 
                 # Mensaje de texto entre nodos
                 elif msg_type == 1:
+                    ts = int(time())
+                    self.log = ''
                     if node_msg['to'] == self.node.id:
-                        print(f'Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.')
-                        print(f'El mensaje es: {node_msg["msg"]}')
+                        self.log += f'[{ts}] Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.\n'
+                        self.log += f'[{ts}] Nodo: El mensaje es: {node_msg["msg"]}\n'
                     else:
-                        print(f'Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.')
-                        best_id = self.node.get_best_path_node_id(data['message']['to'])
-                        print(f'Nodo {self.node.id}: reenviando mensaje a {best_id}')
+                        best_id, best_cost = self.node.get_best_path_node_id(data['message']['to'])
+                        self.log += f'[{ts}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
+                        self.log += f'[{ts}] Nodo: {self.node.id}: reenviando mensaje a {best_id} | distancia: {best_cost}\n'
                         
                         # preparar mensaje a ser reenviado
                         msg_map = {
@@ -122,6 +136,10 @@ class DVClient:
                         # enviar mensaje a servidor
                         msg_json = json.dumps(msg_map).encode('utf-8')
                         self.socket.sendall(msg_json)
+
+                    # escribir a archivo log
+                    t = Thread(target=self.write_to_log_file)
+                    t.start()
             
             iters += 1
             if iters == 10:
