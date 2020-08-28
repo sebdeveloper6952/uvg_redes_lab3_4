@@ -33,22 +33,25 @@ def process_message(message, connection):
             response["id"] = userId
         except:
             response["type"] = 402
-    elif (obj["type"] == 103): #104 Create room
-        
-        #Build response
-        response["type"] = 104
-        response["idSender"] = obj["idSender"]
-        response["idReciever"] = obj["idReciever"]
-        response["message"] = obj["message"]
-        #Send Message
-        users[obj["idReciever"]]["socket"].send(repr(response).encode("utf-8"))
-        response = None 
-        
-        #response["type"] = 404
-    elif (obj["type"] == 105): #104 Create room
+    elif (obj["type"] == 103): #103 Send message
+        try:
+            #Build response
+            response["type"] = 104
+            response["idSender"] = obj["idSender"]
+            response["idReciever"] = obj["idReciever"]
+            response["message"] = obj["message"]
+            #Send Message
+            print("llegamos")
+            users[obj["idReciever"]]["socket"].send(repr(response).encode("utf-8"))
+            #print("Se envio")
+            response = ""
+        except:
+            response["type"] = 404
+    elif (obj["type"] == 105): #105 Conexion between nodes
         try:
             #Build response
             response["type"] = 106
+            response["idSender"] = obj["idSender"]
             #Send Message
             users[obj["idReciever"]]["socket"].send(repr(response).encode("utf-8"))
             users[obj["idSender"]]["socket"].send(repr(response).encode("utf-8"))
