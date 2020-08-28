@@ -33,21 +33,23 @@ def process_message(message, connection):
             response["id"] = userId
         except:
             response["type"] = 402
-    elif (obj["type"] == 103): #103 Send message
-        try:
-            #Build response
-            response["type"] = 104
-            response["idSender"] = obj["idSender"]
-            response["idReciever"] = obj["idReciever"]
-            response["message"] = obj["message"]
-            #Send Message
-            print("llegamos")
-            users[obj["idReciever"]]["socket"].send(repr(response).encode("utf-8"))
-            #print("Se envio")
-            response = ""
-        except:
-            response["type"] = 404
-    elif (obj["type"] == 105): #105 Conexion between nodes
+    elif (obj["type"] == 103): #104 Create room
+        
+        #Build response
+        response["type"] = 104
+        response["idSender"] = obj["idSender"]
+        response["idReciever"] = obj["idReciever"]
+        response["message"] = obj["message"]
+        
+        if "p" in obj:
+            response["p"] = obj["p"]
+        
+        #Send Message
+        users[obj["idReciever"]]["socket"].send(repr(response).encode("utf-8"))
+        response = None
+        
+        #response["type"] = 404
+    elif (obj["type"] == 105): #104 Create room
         try:
             #Build response
             response["type"] = 106
@@ -72,7 +74,7 @@ def service_connection(key, mask):
     sock = key.fileobj #Quien mando el objeto
     data = key.data #Que objeto mando
     if mask & selectors.EVENT_READ: # Si logramos leer algo
-        recv_data = sock.recv(1024)  # Should be ready to read
+        recv_data = sock.recv(2048)  # Should be ready to read
         if recv_data: #Si leemos algo´
             data.outb += recv_data
         else: #el cliente cerro su sokcet
