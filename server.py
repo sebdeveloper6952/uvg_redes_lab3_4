@@ -73,7 +73,7 @@ def service_connection(key, mask):
     sock = key.fileobj #Quien mando el objeto
     data = key.data #Que objeto mando
     if mask & selectors.EVENT_READ: # Si logramos leer algo
-        recv_data = sock.recv(2048)  # Should be ready to read
+        recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data: #Si leemos algo´
             data.outb += recv_data
         else: #el cliente cerro su sokcet
