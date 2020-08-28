@@ -6,8 +6,8 @@ from select import select
 from time import sleep, time
 from threading import Thread
 
-MSG_SIZE = 2048
-LOG_FILE = 'dv_log.txt'
+MSG_SIZE = 1100
+LOG_FILE = './log/dv_log.txt'
 
 class DVClient:
     def __init__(self, host, port, node_id, neighbors):
@@ -38,7 +38,7 @@ class DVClient:
         Tambien imprime a consola para revisión.
         """
         print(self.log)
-        with open(f'./log/{LOG_FILE}', 'a') as f:
+        with open(LOG_FILE, 'a') as f:
             f.write(self.log)
         self.log = ''
 
@@ -141,11 +141,16 @@ class DVClient:
                     t = Thread(target=self.write_to_log_file)
                     t.start()
             
-            iters += 1
-            if iters == 10:
+            if self.node.is_node_ready():
                 print(f'Nodo {self.node.id} esta listo para enviar mensajes...')
                 t = Thread(target=self.write_table_to_file)
                 t.start()
+
+            # iters += 1
+            # if iters == 10:
+            #     print(f'Nodo {self.node.id} esta listo para enviar mensajes...')
+            #     t = Thread(target=self.write_table_to_file)
+            #     t.start()
 
     def close_socket(self):
         self.socket.close()

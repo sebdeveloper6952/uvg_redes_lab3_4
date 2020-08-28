@@ -1,8 +1,9 @@
 import socket
 import json
 
-MSG_SIZE = 2048
-HOST = '127.0.0.1'
+MSG_SIZE = 1100
+# HOST = '127.0.0.1'
+HOST = '45.79.196.203'
 PORT = 65432
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
