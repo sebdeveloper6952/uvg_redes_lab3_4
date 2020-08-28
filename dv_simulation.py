@@ -2,8 +2,11 @@ from dv_client import DVClient
 import json
 from threading import Thread
 
+HOST = '45.79.196.203'
+PORT = 65432
+
 def thread_work(id, neighbors):
-    client = DVClient('127.0.0.1', 65432, id, neighbors)
+    client = DVClient(HOST, PORT, id, neighbors)
 
 threads = []
 # lectura de archivo de topologia de red
