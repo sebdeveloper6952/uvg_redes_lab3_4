@@ -1,4 +1,4 @@
-INF = 2 ** 32
+INF = 99
 
 class DVNode:
     """

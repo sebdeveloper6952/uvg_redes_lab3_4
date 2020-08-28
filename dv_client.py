@@ -6,7 +6,7 @@ from select import select
 from time import sleep, time
 from threading import Thread
 
-MSG_SIZE = 1100
+MSG_SIZE = 1024
 LOG_FILE = './log/dv_log.txt'
 
 class DVClient:
