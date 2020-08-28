@@ -49,21 +49,20 @@ class DVNode:
 
         return updated
 
-    def prep_send_message(self, id_to):
+    def get_best_path_node_id(self, id_to):
         """
         Retorna el id del nodo a quien se debe enviar un mensaje
         para enviar un mensaje a nodo con id (id_to).
         """
-        for to in range(self.num_nodes):
-            if to == id_to:
-                shortest_path = INF
-                shortest_id = 0
-                for via in range(self.num_nodes):
-                    if self.table[to][via] < shortest_path:
-                        shortest_path = self.table[to][via]
-                        shortest_id = via
+        best_cost = INF
+        best_node_id = 0
+        for i in range(self.num_nodes):
+            if self.table[id_to][i] < best_cost:
+                best_cost = self.table[id_to][i]
+                best_node_id = i
         
-        return shortest_id
+        return best_node_id
+        
 
     def get_shortest_paths(self):
         """
