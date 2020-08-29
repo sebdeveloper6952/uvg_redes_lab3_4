@@ -48,13 +48,6 @@ class DVNode:
                     updated = True
 
         return updated
-    
-    def is_node_ready(self):
-        paths = self.get_shortest_paths()
-        for p in paths:
-            if p[1] == INF:
-                return False
-        return True
 
 
     def get_best_path_node_id(self, id_to):
