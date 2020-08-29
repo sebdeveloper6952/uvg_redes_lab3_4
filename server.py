@@ -21,8 +21,16 @@ def process_message(message, connection):
     if (obj["type"] == 101): #101 Login
         try: 
             #Generate user id
-            userId = usersC
-            usersC += 1
+
+            # experimento para sebas
+            if 'my_id' in obj:
+                userId = obj['my_id']
+            else:
+                userId = usersC
+                usersC += 1
+
+            # userId = usersC
+            # usersC += 1
             #Add user to list
             users[userId] =  { #id
                 "id": obj["id"],

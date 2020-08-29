@@ -52,13 +52,11 @@ class DVClient:
 
             size = len(json.dumps(msg).encode('utf-8'))
             msg["p"] = '0' * (MSG_SIZE - size)
-
-            # print(f'Nodo {self.node.id} enviando tabla a {n}')
             
             msg = json.dumps(msg)
             msg = msg.encode('utf-8')
             self.socket.sendall(msg)
-            sleep(0.25)
+            sleep(1 + self.node.id)
 
     def init_node(self):
         """
@@ -67,8 +65,9 @@ class DVClient:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
         print(f'Nodo {self.node.id}: conectado al servidor.')
+        
         # enviar mensaje de login
-        msg = json.dumps({"type": 101, "id": self.my_id})
+        msg = json.dumps({"type": 101, "id": self.my_id, "my_id": self.my_id})
         self.socket.sendall(msg.encode('utf-8'))
         data = self.socket.recv(MSG_SIZE)
         data = data.decode('utf-8').replace('\'', '\"')
@@ -76,7 +75,6 @@ class DVClient:
         if dec_msg['type'] == 102:
             print(f'Nodo {self.node.id}: ha iniciado sesion.')
             print(f'Nodo {self.node.id}: vecinos: {self.node.neighbors}')
-            sleep(3)
             self.run_node()
         else:
             print(f'Nodo {self.node.id}: error al iniciar sesion.')
@@ -84,12 +82,13 @@ class DVClient:
 
     def run_node(self):
         # envio inicial de tabla a vecinos
-        self.send_table_to_neighbors()
+        # self.send_table_to_neighbors()
         
-        c = 0
         while True:
+            self.send_table_to_neighbors()
+
             # revisar si hay mensajes por leer
-            to_read, _, _ = select([self.socket], [], [], 0.1)
+            to_read, _, _ = select([self.socket], [], [], 1.0)
             
             # si hay mensajes pendientes, procesar
             if to_read:
@@ -102,16 +101,18 @@ class DVClient:
 
                     # Mensaje de actualización de tabla de ruteo
                     if msg_type == 0 and int(data['idReciever']) == self.node.id:
-                        print(f'Nodo {self.node.id}: recibi tabla de {data["idSender"]}')
-                        print(f'Nodo {self.node.id} -> {data}')
+                        # print(f'Nodo {self.node.id}: recibi tabla de {data["idSender"]}')
+                        # print(f'Nodo {self.node.id} -> {data}')
                         if self.node.update_table(data['idSender'], data['message']['table']):
                             print(f'Nodo {self.node.id}: tabla actualizada por {data["idSender"]}')
                             # enviar tabla actualizada a vecinos
-                            self.send_table_to_neighbors()
+                            # self.send_table_to_neighbors()
 
                             # imprimir tabla de este nodo a archivo
                             t = Thread(target=self.write_table_to_file)
                             t.start()
+                    elif int(data['idReciever']) != self.node.id:
+                        print(f'{self.node.id}: mal mensaje {data}')
 
                     # Mensaje de texto entre nodos
                     elif msg_type == 1:
@@ -150,7 +151,7 @@ class DVClient:
                         t.start()
 
                     # leer socket
-                    to_read, _, _ = select([self.socket], [], [], 0.1)
+                    to_read, _, _ = select([self.socket], [], [], 1.0)
                     if to_read:
                         data = self.socket.recv(MSG_SIZE)
                     else:
