@@ -43,7 +43,8 @@ while True:
                 "type": 1,
                 "from": src,
                 "to": dst,
-                "msg": msg 
+                "msg": msg,
+                "hops": 0
             }
             
             msg_map = {

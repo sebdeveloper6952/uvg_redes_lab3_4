@@ -56,7 +56,7 @@ class DVClient:
             msg = json.dumps(msg)
             msg = msg.encode('utf-8')
             self.socket.sendall(msg)
-            sleep(1 + self.node.id)
+            sleep(0.25)
 
     def init_node(self):
         """
@@ -82,10 +82,9 @@ class DVClient:
 
     def run_node(self):
         # envio inicial de tabla a vecinos
-        # self.send_table_to_neighbors()
+        self.send_table_to_neighbors()
         
         while True:
-            self.send_table_to_neighbors()
 
             # revisar si hay mensajes por leer
             to_read, _, _ = select([self.socket], [], [], 1.0)
@@ -106,7 +105,7 @@ class DVClient:
                         if self.node.update_table(data['idSender'], data['message']['table']):
                             print(f'Nodo {self.node.id}: tabla actualizada por {data["idSender"]}')
                             # enviar tabla actualizada a vecinos
-                            # self.send_table_to_neighbors()
+                            self.send_table_to_neighbors()
 
                             # imprimir tabla de este nodo a archivo
                             t = Thread(target=self.write_table_to_file)
@@ -122,9 +121,19 @@ class DVClient:
                             self.log += f'[{ts}] Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.\n'
                             self.log += f'[{ts}] Nodo: El mensaje es: {node_msg["msg"]}\n'
                         else:
-                            best_id, best_cost = self.node.get_best_path_node_id(data['message']['to'])
-                            self.log += f'[{ts}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
-                            self.log += f'[{ts}] Nodo: {self.node.id}: reenviando mensaje a {best_id} | distancia: {best_cost}\n'
+                            # obtener siguiente nodo en ruta y su costo
+                            best_id, best_cost = self.node.get_best_path_node_id(node_msg['to'])
+                            if node_msg['from'] == self.node.id:
+                                self.log += f'[{ts}] Nodo {self.node.id}: comenzaré envío de mensaje a nodo {node_msg["to"]}.\n'
+                            else:
+                                # actualizar número de hops
+                                node_msg['hops'] = node_msg['hops'] + 1
+                                self.log += f'[{ts}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
+                                self.log += f''
+                            self.log += f'[{ts}] Nodo: {self.node.id}: '
+                            self.log += f'reenviando mensaje a {best_id} | '
+                            self.log += f'distancia hacia destino final: {best_cost} | '
+                            self.log += f'saltos hasta ahora: {node_msg["hops"]}\n'
                             
                             # preparar mensaje a ser reenviado
                             msg_map = {
