@@ -22,8 +22,16 @@ def process_message(message, connection):
     if (obj["type"] == 101): #101 Login
         try: 
             #Generate user id
-            userId = usersC
-            usersC += 1
+
+            # experimento para sebas
+            if 'my_id' in obj:
+                userId = obj['my_id']
+            else:
+                userId = usersC
+                usersC += 1
+
+            # userId = usersC
+            # usersC += 1
             #Add user to list
             users[userId] =  { #id
                 "id": obj["id"],
@@ -87,14 +95,26 @@ def service_connection(key, mask):
         if data.outb:
             #print(key, mask)
             message = data.outb
-            #print("recibi", message.decode("utf-8"), type(message.decode("utf-8")))
-            response = process_message(message.decode("utf-8").replace('\'', '\"'), sock)
-            if (response):
-                sock.send(repr(response).encode("utf-8"))  # Should be ready to write
-                # sent = sock.send(repr(response).encode("utf-8"))  # For checking send data
-            data.outb = data.outb[len(message):]
-###########################################################################################
+            # print("recibi", message.decode("utf-8"))
 
+            # procesar posibles múltiples mensajes
+            msg_queue = message.decode('utf-8').split('}{')
+            l = len(msg_queue)
+            # print(f'Server: recibi {l} mensajes...')
+            if l > 1:
+                msg_queue[0] = msg_queue[0] = '}'
+                msg_queue[-1] = '{' + msg_queue[-1]
+                if l > 2:
+                    for i in range(1, l - 1):
+                        msg_queue[i] = '{' + msg_queue[i] + '}'
+            
+            for msg in msg_queue:
+                # print(f'Server: procesando {msg}')
+                response = process_message(message.decode('utf-8').replace('\'', '\"'), sock)
+                if response:
+                    sent = sock.send(repr(response).encode('utf-8'))
+            data.outb = data.outb[len(message):]
+            
 sel = selectors.DefaultSelector() #Crear el multiplexor por defecto
 
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Crear socket IPV4, TCP

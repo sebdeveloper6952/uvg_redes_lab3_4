@@ -1,13 +1,19 @@
 import socket
 import json
+import sys
 
-MSG_SIZE = 1100
-# HOST = '127.0.0.1'
+local = False
+if len(sys.argv) > 1:
+    local = sys.argv[1] == '1'
+
+MSG_SIZE = 1024
+LOCALHOST = '127.0.0.1'
 HOST = '45.79.196.203'
 PORT = 65432
+h = LOCALHOST if local else HOST
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-socket.connect((HOST, PORT))
+socket.connect((h, PORT))
 print(f'Nodo mensajero conectado al servidor.')
 
 def print_menu():
@@ -37,7 +43,8 @@ while True:
                 "type": 1,
                 "from": src,
                 "to": dst,
-                "msg": msg 
+                "msg": msg,
+                "hops": 0
             }
             
             msg_map = {
