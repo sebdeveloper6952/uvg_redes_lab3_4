@@ -7,8 +7,8 @@ PORT = 65432        # The port used by the server
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
-    while True:
-        mensaje = input("Mensaje: ")
-        s.sendall(mensaje.encode("utf-8"))
-        data = s.recv(1024)
-        print('Received', data)
+    #message ={"type":103,"idSender":-1,"idReciever":0,"message":{"id":-1,"n":1,"reciver":1,"body":""}}
+    #s.sendall(repr(message).encode("utf-8"))
+    message ={"type":103,"idSender":-1,"idReciever":0,"message":{"id":-1,"n":2,"reciver":1,"body":"Hola"}}
+    s.sendall(repr(message).encode("utf-8"))
+    s.close()

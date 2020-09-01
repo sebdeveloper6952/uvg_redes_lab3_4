@@ -44,40 +44,35 @@ class FlClient:
                 if data:
                     print(f'Nodo {self.my_id}: hay data, leyendo...')
                     data = data.decode('utf-8').replace('\'', '\"')
-                    print("llegamos", data)
-                    try:
-                        print(data["message"])
-                    except:
-                        print("No jalo")
-                    """
+                    print(data)
+                    data = json.loads(data)
                     if (data["type"] == 106): #new conexion
-                        if (data["idSender"] != self.my_id):
+                        if (data["idSender"] != self.server_id):
                             self.neighbors.append(data["idSender"])
                             print('Nodo',self.my_id,': Cree una conexion con', data["idSender"])
                     if (data["type"] == 104): #message
-                        print("llegue", data["message"])
-                        #self.process_message(data["message"].replace('\'', '\"'))
-                        pass
-                    """
+                        self.process_message(data["message"])
+                        #pass
                     #print(data)
 
     def process_message(self, message): #instructions
         #data = message.decode("utf-8")
-        print('llegamos')
-        data = json.loads(message)
+        data = message
         ## Add messages send by master
         if (data['id'] == -1): #if it is -1 , is an instruction
             response = {}
-            response["idSender"] = self.my_id
+            response["idSender"] = self.server_id
             if (data['n'] == 1): #create conection,
                 response["type"] = 105
-                response["idReciver"] = data['reciver']
+                response["idReciever"] = data['reciver']
+                print('Nodo',self.my_id,"Solicitando una conexion con: ", data['reciver'])
                 self.neighbors.append(data["reciver"])
                 msg = json.dumps(response)
                 msg = msg.encode('utf-8')
                 self.socket.sendall(msg)
             if (data['n'] == 2): #initite message
                 response["type"] = 103
+                print('Nodo',self.my_id,"Create message")
                 self.rMessages.append((str( self.my_id ) + str( self.mCounter )))
                 #Create the message
                 body = {}
@@ -86,28 +81,29 @@ class FlClient:
                 self.mCounter += 1
                 body['reciver'] = data['reciver']
                 body['body'] = data['body']
-                msg = json.dumps(body)
-                response['message'] = msg
+                response['message'] = body
                 for i in self.neighbors:
                     response["idReciever"] = i
                     msg = json.dumps(response)
                     msg = msg.encode('utf-8')
                     self.socket.sendall(msg)
-        """
         else:
-            #check if it is for me
+            print('Nodo',self.my_id,"Recibi un mensaje")
             if (not (str( data['id'] ) + str( data['n'] )) in self.rMessages ):
                 self.rMessages.append((str( data['id'] ) + str( data['n'] )))
-                response = {}
-                response["type"] = 103
-                response["idSender"] = self.my_id
-                response["message"] = message
-                for i in self.neighbors:
-                    response["idReciever"] = i
-                    msg = json.dumps(response)
-                    msg = msg.encode('utf-8')
-                    self.socket.sendall(msg)
-        """
+                #check if it is for me
+                if (data['reciver'] == self.my_id):
+                    print('Nodo',self.my_id,"Es para mi, mensaje: ", data['body'])
+                else:
+                    response = {}
+                    response["type"] = 103
+                    response["idSender"] = self.my_id
+                    response["message"] = message
+                    for i in self.neighbors:
+                        response["idReciever"] = i
+                        msg = json.dumps(response)
+                        msg = msg.encode('utf-8')
+                        self.socket.sendall(msg)
     def close_socket(self):
         self.socket.close()
         print(f'Nodo {self.my_id}: cerrando conexion con servidor.')

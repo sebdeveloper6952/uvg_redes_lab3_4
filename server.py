@@ -14,6 +14,7 @@ usersC = 0
 
 def process_message(message, connection):
     global usersC
+    print(message)
     obj = json.loads(message)
     response =	{
         "type": 0
@@ -33,7 +34,7 @@ def process_message(message, connection):
             response["id"] = userId
         except:
             response["type"] = 402
-    elif (obj["type"] == 103): #104 Create room
+    elif (obj["type"] == 103): #104 Send message
         
         #Build response
         response["type"] = 104
@@ -49,12 +50,13 @@ def process_message(message, connection):
         response = None
         
         #response["type"] = 404
-    elif (obj["type"] == 105): #104 Create room
-        try:
+    elif (obj["type"] == 105): #105 Create conexion
             #Build response
-            response["type"] = 106
-            response["idSender"] = obj["idSender"]
+        response["type"] = 106
+        response["idSender"] = obj["idSender"]
             #Send Message
+        print("Objeto: ",obj)
+        try:
             users[obj["idReciever"]]["socket"].send(repr(response).encode("utf-8"))
             users[obj["idSender"]]["socket"].send(repr(response).encode("utf-8"))
             response = None 
@@ -86,7 +88,7 @@ def service_connection(key, mask):
             #print(key, mask)
             message = data.outb
             #print("recibi", message.decode("utf-8"), type(message.decode("utf-8")))
-            response = process_message(message.decode("utf-8"), sock)
+            response = process_message(message.decode("utf-8").replace('\'', '\"'), sock)
             if (response):
                 sock.send(repr(response).encode("utf-8"))  # Should be ready to write
                 # sent = sock.send(repr(response).encode("utf-8"))  # For checking send data
