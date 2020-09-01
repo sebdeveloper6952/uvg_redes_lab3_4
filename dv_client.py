@@ -118,14 +118,13 @@ class DVClient:
                     elif msg_type == 1:
                         self.log = ''
                         if node_msg['to'] == self.node.id:
+                            # actualizar número de hops
+                            node_msg['hops'] = node_msg['hops'] + 1
                             self.log += f'[{int(time())}] Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.\n'
                             self.log += f'[{int(time())}] Nodo {self.node.id}: saltos totales: {node_msg["hops"]}\n'
                             self.log += f'[{int(time())}] Nodo {self.node.id}: El mensaje es: {node_msg["msg"]}\n'
                             self.log += '******************************************************************************\n\n'
                         else:
-                            # actualizar número de hops
-                            node_msg['hops'] = node_msg['hops'] + 1
-                            
                             # obtener siguiente nodo en ruta y su costo
                             best_id, best_cost = self.node.get_best_path_node_id(node_msg['to'])
                             
@@ -133,6 +132,8 @@ class DVClient:
                             if node_msg['from'] == self.node.id:
                                 self.log += f'[{int(time())}] Nodo {self.node.id}: comenzaré envío de mensaje a nodo {node_msg["to"]}.\n'
                             else:
+                                # actualizar número de hops
+                                node_msg['hops'] = node_msg['hops'] + 1
                                 self.log += f'[{int(time())}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
                                 self.log += f''
 
