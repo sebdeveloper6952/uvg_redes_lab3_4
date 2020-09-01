@@ -12,8 +12,12 @@ users = {}
 #counters
 usersC = 0
 
+# prueba para contar numero de mensajes
+msgCount = 0
+
 def process_message(message, connection):
     global usersC
+    global msgCount
     print(message)
     obj = json.loads(message)
     response =	{
@@ -49,7 +53,14 @@ def process_message(message, connection):
         response["idSender"] = obj["idSender"]
         response["idReciever"] = obj["idReciever"]
         response["message"] = obj["message"]
+
+        # prueba para contar numero de mensajes
+        if "type" in obj["message"]:
+            if obj["message"]["type"] == 0:
+                msgCount += 1
+                print(f'Se han enviado {msgCount} mensajes.')
         
+        # incluir padding
         if "p" in obj:
             response["p"] = obj["p"]
         
