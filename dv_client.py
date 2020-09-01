@@ -118,9 +118,10 @@ class DVClient:
                     elif msg_type == 1:
                         self.log = ''
                         if node_msg['to'] == self.node.id:
-                            self.log += f'[{int(time.time())}] Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.\n'
-                            self.log += f'[{int(time.time())}] Nodo {self.node.id}: saltos totales: {node_msg["hops"]}\n'
-                            self.log += f'[{int(time.time())}] Nodo {self.node.id}: El mensaje es: {node_msg["msg"]}\n'
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.\n'
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: saltos totales: {node_msg["hops"]}\n'
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: El mensaje es: {node_msg["msg"]}\n'
+                            self.log += '******************************************************************************\n\n'
                         else:
                             # actualizar número de hops
                             node_msg['hops'] = node_msg['hops'] + 1
@@ -130,13 +131,13 @@ class DVClient:
                             
                             # revisar si nodo es quien inicia el envio de mensaje
                             if node_msg['from'] == self.node.id:
-                                self.log += f'[{int(time.time())}] Nodo {self.node.id}: comenzaré envío de mensaje a nodo {node_msg["to"]}.\n'
+                                self.log += f'[{int(time())}] Nodo {self.node.id}: comenzaré envío de mensaje a nodo {node_msg["to"]}.\n'
                             else:
-                                self.log += f'[{int(time.time())}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
+                                self.log += f'[{int(time())}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
                                 self.log += f''
 
                             # informacion para el archivo log
-                            self.log += f'[{int(time.time())}] Nodo {self.node.id}: '
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: '
                             self.log += f'reenviando mensaje a {best_id} | '
                             self.log += f'distancia hacia destino final: {best_cost} | '
                             self.log += f'saltos hasta ahora: {node_msg["hops"]}\n'
@@ -159,7 +160,7 @@ class DVClient:
                             msg_encoded = msg_json.encode('utf-8')
                             self.socket.sendall(msg_encoded)
 
-                            print(f'[{int(time.time())}] Nodo {self.node.id}: se envió mensaje.')
+                            print(f'[{int(time())}] Nodo {self.node.id}: se envió mensaje.')
 
                         # escribir a archivo log
                         t = Thread(target=self.write_to_log_file)
