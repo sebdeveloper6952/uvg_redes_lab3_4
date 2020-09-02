@@ -36,17 +36,20 @@ class DVClient:
         Escribe al archivo de log sobre los mensajes enviados a traves de este nodo.
         Tambien imprime a consola para revisión.
         """
-        print(self.log)
         with open(LOG_FILE, 'a') as f:
             f.write(self.log)
         self.log = ''
 
-    def send_table_to_neighbors(self):
+    def send_table_to_neighbors(self, exceptions=[]):
         """
         Enviar tabla de ruteo de este nodo a vecinos.
         """
         print(f'Nodo {self.node.id}: enviando tabla a {self.node.neighbors}')
         for n in self.node.neighbors:
+            # no enviar a estos nodos
+            if n in exceptions:
+                continue
+            
             table_msg = {"type": 0, "table": self.node.table}
             msg = {"type": 103, "idSender": self.node.id, "idReciever": n, "message": table_msg, "p": ""}
 
@@ -100,12 +103,10 @@ class DVClient:
 
                     # Mensaje de actualización de tabla de ruteo
                     if msg_type == 0 and int(data['idReciever']) == self.node.id:
-                        # print(f'Nodo {self.node.id}: recibi tabla de {data["idSender"]}')
-                        # print(f'Nodo {self.node.id} -> {data}')
                         if self.node.update_table(data['idSender'], data['message']['table']):
                             print(f'Nodo {self.node.id}: tabla actualizada por {data["idSender"]}')
                             # enviar tabla actualizada a vecinos
-                            self.send_table_to_neighbors()
+                            self.send_table_to_neighbors(exceptions=[data['idSender']])
 
                             # imprimir tabla de este nodo a archivo
                             t = Thread(target=self.write_table_to_file)
@@ -115,22 +116,29 @@ class DVClient:
 
                     # Mensaje de texto entre nodos
                     elif msg_type == 1:
-                        ts = int(time())
                         self.log = ''
                         if node_msg['to'] == self.node.id:
-                            self.log += f'[{ts}] Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.\n'
-                            self.log += f'[{ts}] Nodo: El mensaje es: {node_msg["msg"]}\n'
+                            # actualizar número de hops
+                            node_msg['hops'] = node_msg['hops'] + 1
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: he recibido mensaje de texto y yo soy el destinatario final.\n'
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: saltos totales: {node_msg["hops"]}\n'
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: El mensaje es: {node_msg["msg"]}\n'
+                            self.log += '******************************************************************************\n\n'
                         else:
                             # obtener siguiente nodo en ruta y su costo
                             best_id, best_cost = self.node.get_best_path_node_id(node_msg['to'])
+                            
+                            # revisar si nodo es quien inicia el envio de mensaje
                             if node_msg['from'] == self.node.id:
-                                self.log += f'[{ts}] Nodo {self.node.id}: comenzaré envío de mensaje a nodo {node_msg["to"]}.\n'
+                                self.log += f'[{int(time())}] Nodo {self.node.id}: comenzaré envío de mensaje a nodo {node_msg["to"]}.\n'
                             else:
                                 # actualizar número de hops
                                 node_msg['hops'] = node_msg['hops'] + 1
-                                self.log += f'[{ts}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
+                                self.log += f'[{int(time())}] Nodo {self.node.id}: he recibido mensaje de texto pero soy un intermediario.\n'
                                 self.log += f''
-                            self.log += f'[{ts}] Nodo: {self.node.id}: '
+
+                            # informacion para el archivo log
+                            self.log += f'[{int(time())}] Nodo {self.node.id}: '
                             self.log += f'reenviando mensaje a {best_id} | '
                             self.log += f'distancia hacia destino final: {best_cost} | '
                             self.log += f'saltos hasta ahora: {node_msg["hops"]}\n'
@@ -153,7 +161,7 @@ class DVClient:
                             msg_encoded = msg_json.encode('utf-8')
                             self.socket.sendall(msg_encoded)
 
-                            print(f'Nodo {self.node.id}: se envio mensaje | size {len(msg_encoded)}')
+                            print(f'[{int(time())}] Nodo {self.node.id}: se envió mensaje.')
 
                         # escribir a archivo log
                         t = Thread(target=self.write_to_log_file)
