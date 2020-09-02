@@ -8,7 +8,7 @@ def thread_work(id):
 
 threads = []
 # lectura de archivo de topologia de red
-for node in range(2):
+for node in range(9):
     threads.append(Thread(target=thread_work, args=(node,)))
     #print(node)
 

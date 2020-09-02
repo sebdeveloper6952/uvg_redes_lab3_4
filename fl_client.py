@@ -22,7 +22,7 @@ class FlClient:
         self.socket.connect((self.host, self.port))
         print(f'Nodo {self.my_id}: conectado al servidor.')
         # enviar mensaje de login
-        msg = json.dumps({"type": 101, "id": self.my_id})
+        msg = json.dumps({"type": 101, "id": self.my_id, "my_id": self.my_id})
         self.socket.sendall(msg.encode('utf-8'))
         data = self.socket.recv(1024)
         data = data.decode('utf-8').replace('\'', '\"')
@@ -44,7 +44,7 @@ class FlClient:
                 if data:
                     print(f'Nodo {self.my_id}: hay data, leyendo...')
                     data = data.decode('utf-8').replace('\'', '\"')
-                    print(data)
+                    #print(data)
                     data = json.loads(data)
                     if (data["type"] == 106): #new conexion
                         if (data["idSender"] != self.server_id):
@@ -87,6 +87,7 @@ class FlClient:
                     msg = json.dumps(response)
                     msg = msg.encode('utf-8')
                     self.socket.sendall(msg)
+                    #time.sleep(1)
         else:
             print('Nodo',self.my_id,"Recibi un mensaje")
             if (not (str( data['id'] ) + str( data['n'] )) in self.rMessages ):
@@ -104,6 +105,7 @@ class FlClient:
                         msg = json.dumps(response)
                         msg = msg.encode('utf-8')
                         self.socket.sendall(msg)
+                        #time.sleep(1)
     def close_socket(self):
         self.socket.close()
         print(f'Nodo {self.my_id}: cerrando conexion con servidor.')
