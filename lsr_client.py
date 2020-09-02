@@ -36,8 +36,9 @@ class LsrClient:
         else:
             print(f'Nodo {self.my_id}: error al iniciar sesion.')
             exit(1)
-
+    
     def run_node(self):
+        i = 0
         while True:
             # revisar si hay mensajes por leer
             to_read, _, _ = select([self.socket], [], [], 2.0)
@@ -57,76 +58,86 @@ class LsrClient:
                         self.process_message(data["message"])
                         #pass
                     #print(data)
-        
-            #Descubrir a sus vecinos y sus direcciones
-            print("Que se quede")
-            S = set()  
-            G =[]
-            #Inicio de la matriz 
-            for a in range(4):  
-                listo =[0, 0, 0, 0] 
 
-            dv = DVNode(self.my_id, self.neighbors)
             
-            for b in range(4): 
-                listo[b]= self.my_id #distancias
-            G.append(listo) 
+            while i < 1:
+                #Descubrir a sus vecinos y sus direcciones
+                S = set()  
+                G =[]
+                #Inicio de la matriz 
+                for a in range(4):  
+                    listo =[0, 0, 0, 0] 
 
-            source = self.my_id  #Recibir origen 
-            destination = self.neighbors  #Recibir destino
-            Q = [0, 1, 2, 3]
-            #Medir el costo a cada uno de sus vecinos
-            d =[0, 0, 0, 0]
-            pi =[0, 0, 0, 0]
+                dv = DVNode(self.my_id, self.neighbors)
+                    
+                for b in range(4): 
+                    listo[b]= int(self.my_id) #distancias
+                G.append(listo) 
 
-            #Construir el paquete con la información recabada
-            for i in range(4): 
-                if(i == source): 
-                    d[i]= 0
-                else: 
-                    d[i]= 999
-            for i in range(4): 
-                pi[i]= 9000
-            S.add(source) 
+                source = int(self.my_id)  #Recibir origen 
+                destination = int(len(self.neighbors))  #Recibir destino
+                Q = [0, 1, 2, 3]
+                #Medir el costo a cada uno de sus vecinos
+                d =[0, 0, 0, 0]
+                pi =[0, 0, 0, 0]
 
-            #Mientras los elementos esten en Q, se buscara la distancia minima 
-            while (len(Q)!= 0):  
-                #Desde x buscar todas las minimas distancias entre los nodos 
-                x = min(d[q] for q in Q)  
-                u = 0
-                for q in Q: 
-                    if(d[q]== x):   
-                        u = q  #Se busca el nodo que tiene la minima distancia 
-                        
-                print(u, " Es la distancia mas corta") 
-                Q.remove(u) 
-                S.add(u) 
-                adj =[] 
-                for y in range(4): 
-                    if(y != u and G[u][y]!= 999):      
-                        adj.append(y) #Vertice adyacente 
+                #Construir el paquete con la información recabada
+                for i in range(4): 
+                    if(i == source): 
+                        d[i]= 0
+                    else: 
+                        d[i]= 999
+                for i in range(4): 
+                    pi[i]= 9000
+                S.add(source) 
 
-                #Para cada vector adyacente se calcula la nueva distancia        
-                for v in adj:         
-                    if(d[v]>(d[u]+G[u][v])): 
-                        d[v]= d[u]+G[u][v]  
-                        pi[v]= u
+                #Mientras los elementos esten en Q, se buscara la distancia minima 
+                while (len(Q)!= 0):  
+                    #Desde x buscar todas las minimas distancias entre los nodos 
+                    x = min(d[q] for q in Q)  
+                    u = 0
+                    for q in Q: 
+                        if(d[q]== x):   
+                            u = q  #Se busca el nodo que tiene la minima distancia 
+                                
+                    print(u, " Es la distancia mas corta") 
+                    Q.remove(u) 
+                    S.add(u) 
+                    adj =[] 
+                    for y in range(4): 
+                        if u > 0:
+                            u = 0
+                        if y > len(G[0]):
+                            y = 0
+                        if(y != u and G[u][y]!= 999):      
+                            adj.append(y) #Vertice adyacente 
 
-                route =[] 
-                x = destination 
+                    #Para cada vector adyacente se calcula la nueva distancia        
+                    for v in adj:   
+                        if u > len(adj):
+                            u = u - 1
+                        if v > len(adj):
+                            v = v - 1
+                        if(d[v]>(d[u]+G[u][v])): 
+                            d[v]= d[u]+G[u][v]  
+                            pi[v]= u
 
-                if(pi[x]== 9000):  
-                    print(source) 
-                else: 
-                    while(pi[x]!= 9000):  
-                        route.append(x) 
-                        x = pi[x] 
-                    route.reverse()  
-                #Enviar este paquete al resto
-                print('Ruta: ', route) 
-                print('Camino del vector: ', pi)
-                print('Distancia desde la fuente: ', d) 
+                    route =[] 
+                    x = destination 
 
+                    print("Aqui esta pI: ", pi)
+                    if(pi[x]== 9000):  
+                        print(source) 
+                    else: 
+                        while(pi[x]!= 9000):  
+                            route.append(x) 
+                            x = pi[x] 
+                        route.reverse()  
+                    #Enviar este paquete al resto
+                    print('Ruta: ', route) 
+                    print('Camino del vector: ', pi)
+                    print('Distancia desde la fuente: ', d) 
+        
     def close_socket(self):
         self.socket.close()
         print(f'Nodo {self.my_id}: cerrando conexion con servidor.')
