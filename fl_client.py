@@ -54,6 +54,17 @@ class FlClient:
                     data = data.decode('utf-8').replace('\'', '\"')
                     #print("Recibi: ",data)
                     for data in data.split('}{'):
+                        if (data[0] != '{'):
+                            data ='{' + data
+                        if (data[-1] != '}'):
+                            data = data +'}'
+                        oS = data.count('{')
+                        cS = data.count('}')
+                        if (oS < cS):
+                            data ='{' + data
+                        if (oS > cS):
+                            data = data +'}'
+                        print("Antes del json", data)
                         data = json.loads(data)
                         if (data["type"] == 106): #new conexion
                             if (data["idSender"] != self.server_id):
