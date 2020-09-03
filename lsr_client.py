@@ -135,8 +135,8 @@ class LsrClient:
                         route.reverse()  
                     #Enviar este paquete al resto
                     print('Ruta: ', route) 
-                    print('Camino del vector: ', pi)
-                    print('Distancia desde la fuente: ', d) 
+                    print("Distancia desde el origen: ", pi)
+                    print("Distancia de cada vector desde la fuente: ", d) 
         
     def close_socket(self):
         self.socket.close()
