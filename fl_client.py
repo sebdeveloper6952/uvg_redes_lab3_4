@@ -71,7 +71,7 @@ class FlClient:
                             data ='{' + data
                         if (oS > cS):
                             data = data +'}'
-                        print("Antes del json", data)
+                        #print("Antes del json", data)
                         data = json.loads(data)
                         if (data["type"] == 106): #new conexion
                             if (data["idSender"] != self.server_id):
