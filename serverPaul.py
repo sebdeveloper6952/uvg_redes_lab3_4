@@ -108,7 +108,7 @@ def service_connection(key, mask):
                 #for msg in msg_queue:
                 for i in range(len(msg_queue)):
                     if (msg_queue[i][0] != '{'):
-                        msg_queue[i] ='{' + msg_queue[i]
+                        msg_queue[i] = '{' + msg_queue[i]
                     if (msg_queue[i][-1] != '}'):
                         msg_queue[i] = msg_queue[i] +'}'
                     print("Arreglados", msg_queue[i])
