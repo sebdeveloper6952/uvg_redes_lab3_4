@@ -3,7 +3,8 @@ import json
 from threading import Thread
 
 def thread_work(id):
-    client = FlClient('127.0.0.1', 65432, id)
+    #client = FlClient('127.0.0.1', 65432, id)
+    client = FlClient('45.79.196.203', 65432, id)
     #print(id)
 
 threads = []
