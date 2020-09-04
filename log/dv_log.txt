@@ -1,0 +1,18 @@
+[1599178610] Nodo 0: he recibido mensaje de texto pero soy un intermediario.
+[1599178610] Nodo 0: reenviando mensaje a 2 | distancia hacia destino final: 1 | saltos hasta ahora: 1
+[1599178610] Nodo 1: comenzaré envío de mensaje a nodo 2.
+[1599178610] Nodo 1: reenviando mensaje a 0 | distancia hacia destino final: 6 | saltos hasta ahora: 0
+[1599178610] Nodo 2: he recibido mensaje de texto y yo soy el destinatario final.
+[1599178610] Nodo 2: saltos totales: 2
+[1599178610] Nodo 2: El mensaje es: hola
+******************************************************************************
+
+[1599178614] Nodo 1: comenzaré envío de mensaje a nodo 2.
+[1599178614] Nodo 1: reenviando mensaje a 0 | distancia hacia destino final: 6 | saltos hasta ahora: 0
+[1599178614] Nodo 0: he recibido mensaje de texto pero soy un intermediario.
+[1599178614] Nodo 0: reenviando mensaje a 2 | distancia hacia destino final: 1 | saltos hasta ahora: 1
+[1599178614] Nodo 2: he recibido mensaje de texto y yo soy el destinatario final.
+[1599178614] Nodo 2: saltos totales: 2
+[1599178614] Nodo 2: El mensaje es: 3
+******************************************************************************
+

@@ -4,7 +4,7 @@ from threading import Thread
 import sys
 
 def thread_work(id):
-    client = LsrClient('127.0.0.1', 65432, id)
+    client = LsrClient('45.79.196.203', 65432, id)
 
 threads = []
 # lectura de archivo de topologia de red
